@@ -12,9 +12,12 @@ Regole richieste:
 - Ogni volta che due palline si toccano, viene generata una nuova pallina nel punto di contatto.
 - Stop automatico quando il disco è quasi pieno (frazione area occupata >= soglia).
 
-Uso in Colab:
-1) Copia questo file in una cella (o eseguilo direttamente con `!python nome_file.py`).
-2) Esegui la cella: verrà mostrata un'animazione matplotlib.
+Uso in Colab (reale "in movimento", non immagine statica):
+1) In una cella: `!pip -q install numpy matplotlib`
+2) In una cella: `from colab_circular_collision_sim import run_animation_colab`
+3) In una cella: `run_animation_colab()`
+
+Nota: in Colab la via più robusta è rendering JS/HTML5 dell'animazione.
 """
 
 import math
@@ -277,7 +280,7 @@ class CircleCollisionSimulation:
             self.stopped = True
 
 
-def run_animation(total_frames: int = 4_000):
+def run_animation(total_frames: int = 4_000, interval_ms: int = 16, blit: bool = True):
     import matplotlib.pyplot as plt
     from matplotlib.animation import FuncAnimation
     from matplotlib.patches import Circle
@@ -349,12 +352,24 @@ def run_animation(total_frames: int = 4_000):
         update,
         init_func=init,
         frames=total_frames,
-        interval=16,
-        blit=True,
+        interval=interval_ms,
+        blit=blit,
         repeat=False,
     )
 
     plt.show()
+    return ani
+
+
+def run_animation_colab(total_frames: int = 4_000, interval_ms: int = 16):
+    """
+    Versione consigliata per Google Colab: visualizza la simulazione come
+    animazione HTML/JS realmente evolutiva nel notebook.
+    """
+    from IPython.display import HTML, display
+
+    ani = run_animation(total_frames=total_frames, interval_ms=interval_ms, blit=False)
+    display(HTML(ani.to_jshtml(default_mode="loop")))
     return ani
 
 
